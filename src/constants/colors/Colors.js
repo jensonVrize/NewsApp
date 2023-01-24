@@ -5,5 +5,5 @@ export default {
     APP_BACKGROUND_COLOR: '#1e2626',
     WHITE_COLOR: '#FFFFFF',
     CLEAR: 'transparent',
-    
+    SEMI_TRANSPARENT: '#00000070',
   };

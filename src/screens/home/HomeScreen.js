@@ -5,6 +5,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {Colors, Fonts, Images} from '../../constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FastImage from 'react-native-fast-image';
+import SkeletonContent from 'react-native-skeleton-content-nonexpo';
 import {
   View,
   SafeAreaView,
@@ -105,6 +106,7 @@ const Item = ({fullData}) => {
 const HomeScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const [loading, setLoading] = useState(true);
 
   const renderCategories = ({item}) => <Item fullData={item} />;
 
@@ -175,7 +177,15 @@ const HomeScreen = () => {
 
           {/* Headlines */}
 
-
+          <FlatList
+            style={{marginTop: 20, backgroundColor: Colors.CLEAR}}
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{paddingBottom: 100}}
+            data={categoriesData}
+            renderItem={renderCategories}
+            keyExtractor={item => item.id}
+          />
+          
         </View>
       </SafeAreaView>
     </>

@@ -16,117 +16,170 @@ import {
   TouchableOpacity,
   FlatList,
 } from 'react-native';
-
-const categoriesData = [
-  {
-    id: '7',
-    title: 'Technology',
-    image:
-      'https://img.freepik.com/free-photo/medium-shot-man-wearing-vr-glasses_23-2149126949.jpg?w=2000',
-  },
-  {
-    id: '6',
-    title: 'Sports',
-    image:
-      'https://mybayutcdn.bayut.com/mybayut/wp-content/uploads/Dubai-Sports-World-cover.jpg',
-  },
-  {
-    id: '2',
-    title: 'Entertainment',
-    image: 'https://images.pexels.com/photos/1763075/pexels-photo-1763075.jpeg',
-  },
-
-  {
-    id: '5',
-    title: 'Science',
-    image:
-      'https://thumbs.dreamstime.com/b/ai-machine-learning-hands-robot-human-touching-big-data-network-connection-background-science-artificial-intelligence-172987598.jpg',
-  },
-  {
-    id: '4',
-    title: 'Health',
-    image:
-      'https://m.economictimes.com/thumb/msid-73074326,width-1200,height-900,resizemode-4,imgsize-80591/health-insurance-getty-imag.jpg',
-  },
-  {
-    id: '1',
-    title: 'Business',
-    image:
-      'https://img.freepik.com/free-photo/business-people-shaking-hands-together_53876-30568.jpg?w=2000',
-  },
-  {
-    id: '3',
-    title: 'General',
-    image:
-      'https://chessdailynews.com/wp-content/uploads/2015/03/general_news1.jpg',
-  },
-];
-
-const Item = ({fullData}) => {
-  return (
-    <FastImage
-      style={{
-        width: 120,
-        height: 90,
-        borderRadius: 16,
-        borderWidth: 4,
-        borderColor: Colors.APP_PRIMARY_COLOR,
-        marginLeft: 8,
-        alignItems: 'center',
-      }}
-      source={{
-        uri: fullData.image,
-        priority: FastImage.priority.normal,
-      }}
-      resizeMode={FastImage.resizeMode.cover}>
-      <View
-        style={{
-          width: '100%',
-          height: '30%',
-          position: 'absolute',
-          bottom: 0,
-          backgroundColor: Colors.SEMI_TRANSPARENT,
-          justifyContent: 'center',
-        }}>
-        <Text
-          style={{
-            color: Colors.WHITE_COLOR,
-            fontFamily: Fonts.NANUM_BOLD,
-            fontSize: 12,
-            textAlign: 'center',
-          }}
-          numberOfLines={1}>
-          {fullData.title}
-        </Text>
-      </View>
-    </FastImage>
-  );
-};
+import {useDispatch, useSelector} from 'react-redux';
+import {fetchNews} from '../../redux/slice/news';
+import uniqueId from 'lodash.uniqueid';
+import moment from 'moment';
+import { categoriesData } from './categoryData/CategoryData';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const state = useSelector(state => state);
 
-  const renderCategories = ({item}) => <Item fullData={item} />;
+  console.log('HomeScreen State: ', state);
+
+  useEffect(() => {
+    dispatch(
+      fetchNews({category: 'business', isSearch: false, searchQuery: 'asd'}),
+    );
+  }, []);
+
+  const renderCategories = ({item}) => <CategoryItem fullData={item} />;
+  const renderHeadlines = ({item}) => <HeadlineItem fullData={item} />;
+
+  const keyExtractor = (item, index) => {
+    return item.id || `item-${uniqueId()}`;
+  };
+
+  const CategoryItem = ({fullData}) => {
+    return (
+      <FastImage
+        style={{
+          width: 120,
+          height: 90,
+          borderRadius: 16,
+          borderWidth: 4,
+          borderColor: Colors.APP_PRIMARY_COLOR,
+          marginLeft: 8,
+          alignItems: 'center',
+        }}
+        source={{
+          uri: fullData.image,
+          priority: FastImage.priority.normal,
+        }}
+        resizeMode={FastImage.resizeMode.cover}>
+        <View
+          style={{
+            width: '100%',
+            height: '30%',
+            position: 'absolute',
+            bottom: 0,
+            backgroundColor: Colors.SEMI_TRANSPARENT,
+            justifyContent: 'center',
+          }}>
+          <Text
+            style={{
+              color: Colors.WHITE_COLOR,
+              fontFamily: Fonts.NANUM_BOLD,
+              fontSize: 12,
+              textAlign: 'center',
+            }}
+            numberOfLines={1}>
+            {fullData.title}
+          </Text>
+        </View>
+      </FastImage>
+    );
+  };
+
+  const HeadlineItem = ({fullData}) => {
+    return (
+      <View style={{marginLeft: 8, marginRight: 8, marginBottom: 16}}>
+        <FastImage
+          style={{
+            flex: 1,
+            height: 250,
+            borderRadius: 16,
+            alignItems: 'center',
+          }}
+          source={{
+            uri: fullData.urlToImage,
+            priority: FastImage.priority.normal,
+          }}
+          resizeMode={FastImage.resizeMode.cover}
+        />
+
+        <Text
+          style={{
+            marginTop: 8,
+            marginLeft: 5,
+            marginRight: 5,
+            fontWeight: 'bold',
+            fontSize: 10,
+            color: Colors.PRIMARY_TEXT_COLOR,
+          }}>
+          {(fullData?.source?.name || 'News').toUpperCase()}
+        </Text>
+
+        <Text
+          style={{
+            color: Colors.BLACK_COLOR,
+            fontWeight: 'bold',
+            fontSize: 12,
+            marginTop: 8,
+            marginLeft: 5,
+            marginRight: 5,
+          }}
+          numberOfLines={5}>
+          {fullData.title || 'N/A'}
+        </Text>
+
+        <View style={{flexDirection: 'row', alignContent: 'center'}}>
+          <Text
+            style={{
+              marginTop: 8,
+              marginLeft: 5,
+              marginRight: 5,
+              fontWeight: 'bold',
+              fontSize: 10,
+              color: Colors.LIGHT_GREY,
+            }}>
+            {moment(fullData?.publishedAt).fromNow()}
+          </Text>
+
+          <Text style={{fontSize: 20, color: Colors.LIGHT_GREY}}>•</Text>
+
+          <Text
+            style={{
+              marginTop: 8,
+              marginLeft: 5,
+              marginRight: 5,
+              fontWeight: 'bold',
+              fontSize: 10,
+              color: Colors.LIGHT_GREY,
+            }}>
+            {fullData?.author || 'Self'}
+          </Text>
+        </View>
+
+        <View
+          style={{
+            marginTop: 12,
+            height: 0.4,
+            backgroundColor: Colors.LIGHT_GREY,
+          }}
+        />
+      </View>
+    );
+  };
 
   return (
     <>
       <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
+      <SafeAreaView bo>
         <View
-          style={
-            {
-              //backgroundColor: Colors.WHITE_COLOR,
-            }
-          }>
+          style={{
+            height: '100%',
+          }}>
           {/* TOP BAR */}
           <View
             style={{
               paddingLeft: 16,
               paddingRight: 16,
               height: 50,
-
               justifyContent: 'space-between',
               flexDirection: 'row',
               alignItems: 'center',
@@ -166,26 +219,35 @@ const HomeScreen = () => {
           </View>
           {/* Categories */}
           <FlatList
-            style={{marginTop: 20, backgroundColor: Colors.CLEAR}}
+            style={{marginTop: 20, height: 125, backgroundColor: Colors.CLEAR}}
             horizontal
             showsHorizontalScrollIndicator={false}
-            //contentContainerStyle={{paddingBottom: 100}}
             data={categoriesData}
             renderItem={renderCategories}
             keyExtractor={item => item.id}
           />
 
           {/* Headlines */}
+          <Text
+            style={{
+              marginTop: 8,
+              marginLeft: 10,
+              marginRight: 8,
+              fontFamily: Fonts.NANUM_EXTRA_BOLD,
+              fontSize: 14,
+            }}>
+            TOP HEADLINES
+          </Text>
 
           <FlatList
-            style={{marginTop: 20, backgroundColor: Colors.CLEAR}}
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{paddingBottom: 100}}
-            data={categoriesData}
-            renderItem={renderCategories}
-            keyExtractor={item => item.id}
+            style={{marginTop: 8, backgroundColor: Colors.CLEAR}}
+            data={state.news?.data?.articles?.map((item, index) => ({
+              key: keyExtractor(item, index),
+              ...item,
+            }))}
+            renderItem={renderHeadlines}
+            keyExtractor={keyExtractor}
           />
-          
         </View>
       </SafeAreaView>
     </>

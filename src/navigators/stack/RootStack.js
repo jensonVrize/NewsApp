@@ -17,7 +17,6 @@ const RootStack = () => {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
-
           headerStyle: {
             backgroundColor: '#0000'
           },

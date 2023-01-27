@@ -25,7 +25,6 @@ import { categoriesData } from './categoryData/CategoryData';
 const HomeScreen = () => {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
   const state = useSelector(state => state);
 
@@ -169,7 +168,7 @@ const HomeScreen = () => {
   return (
     <>
       <StatusBar barStyle="dark-content" />
-      <SafeAreaView bo>
+      <SafeAreaView>
         <View
           style={{
             height: '100%',

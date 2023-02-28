@@ -6,6 +6,7 @@ export const fetchNews = createAsyncThunk(
   async (params) => {
     const {category, isSearch, searchQuery} = params;
     console.log(`createAsyncThunk: category: ${category} isSearch: ${isSearch} searchQuery: ${searchQuery}`);
+    const categoryParam = (category != undefined && category != '' && category != null) ? `&category=${category}` : ''
     const response = await fetch(
       isSearch == true
         ? APIs.BASE_URL +

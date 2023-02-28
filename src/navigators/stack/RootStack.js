@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Image } from 'react-native';
 import { navigationRef } from './RootNavigator';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { SplashScreen, HomeScreen } from '../../screens'
+import { SplashScreen, HomeScreen, NewsDetailsScreen, CategoryNewsListScreen } from '../../screens'
 import DashBoardTabs from '../tabNavigatior/DashboardTabs';
 
 //import DrawerNavigatorScreen from '../drawerNavigator/DrawerNavigatorScreen';
@@ -25,6 +25,8 @@ const RootStack = () => {
         options={{ gestureEnabled: false }}>
         <Stack.Screen name="SplashScreen" component={SplashScreen} />
         <Stack.Screen name="DashBoardTabs" component={DashBoardTabs} />
+        <Stack.Screen name="NewsDetailsScreen" component={NewsDetailsScreen} />
+        <Stack.Screen name="CategoryNewsListScreen" component={CategoryNewsListScreen} />
 
       </Stack.Navigator>
     </NavigationContainer>

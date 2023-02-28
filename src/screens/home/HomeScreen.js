@@ -1,4 +1,4 @@
-import React, {useState, useEffect, Fragment} from 'react';
+import React, {useState, useEffect} from 'react';
 import 'react-native-gesture-handler';
 import {useNavigation} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -11,10 +11,10 @@ import {
   SafeAreaView,
   Text,
   Image,
-  ImageBackground,
   StatusBar,
   TouchableOpacity,
   FlatList,
+  ImageBackground,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {fetchNews} from '../../redux/slice/news';
@@ -32,7 +32,7 @@ const HomeScreen = () => {
 
   useEffect(() => {
     dispatch(
-      fetchNews({category: 'business', isSearch: false, searchQuery: 'asd'}),
+      fetchNews({category: '', isSearch: false, searchQuery: 'asd'}),
     );
   }, []);
 
@@ -43,8 +43,13 @@ const HomeScreen = () => {
     return item.id || `item-${uniqueId()}`;
   };
 
+  const categoryItemTouched = (category) => {
+    navigation.navigate('CategoryNewsListScreen', {category});
+  }
+
   const CategoryItem = ({fullData}) => {
     return (
+      <TouchableOpacity onPress={() => categoryItemTouched(fullData.title) }>
       <FastImage
         style={{
           width: 120,
@@ -81,12 +86,20 @@ const HomeScreen = () => {
           </Text>
         </View>
       </FastImage>
+      </TouchableOpacity>
     );
   };
 
+  const newsItemTouched = (newsDetails) => {
+    navigation.navigate('NewsDetailsScreen', {newsDetails});
+  }
+
   const HeadlineItem = ({fullData}) => {
     return (
-      <View style={{marginLeft: 8, marginRight: 8, marginBottom: 16}}>
+      <TouchableOpacity style={{marginLeft: 8, marginRight: 8, marginBottom: 16}}
+      onPress={() => newsItemTouched(fullData)}
+      >
+        
         <FastImage
           style={{
             flex: 1,
@@ -98,6 +111,7 @@ const HomeScreen = () => {
             uri: fullData.urlToImage,
             priority: FastImage.priority.normal,
           }}
+          defaultSource={Images.PLACEHOLDER_ICON}
           resizeMode={FastImage.resizeMode.cover}
         />
 
@@ -161,7 +175,7 @@ const HomeScreen = () => {
             backgroundColor: Colors.LIGHT_GREY,
           }}
         />
-      </View>
+      </TouchableOpacity>
     );
   };
 

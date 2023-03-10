@@ -47,6 +47,11 @@ const HomeScreen = () => {
     navigation.navigate('CategoryNewsListScreen', {category});
   }
 
+  const userIconTouched = () => {
+    navigation.navigate('LoginScreen');
+  }
+
+
   const CategoryItem = ({fullData}) => {
     return (
       <TouchableOpacity onPress={() => categoryItemTouched(fullData.title) }>
@@ -182,7 +187,7 @@ const HomeScreen = () => {
   return (
     <>
       <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
+      <SafeAreaView style={{backgroundColor: Colors.WHITE_COLOR}}>
         <View
           style={{
             height: '100%',
@@ -199,7 +204,7 @@ const HomeScreen = () => {
               borderBottomColor: Colors.APP_BACKGROUND_COLOR,
               borderBottomWidth: 0.2,
             }}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => userIconTouched()}>
               <Image
                 style={{
                   width: 30,
@@ -254,7 +259,7 @@ const HomeScreen = () => {
 
           <FlatList
             style={{marginTop: 8, backgroundColor: Colors.CLEAR}}
-            data={state.news?.data?.articles?.map((item, index) => ({
+            data={state.news?.data?.articles?.slice(0, 15)?.map((item, index) => ({
               key: keyExtractor(item, index),
               ...item,
             }))}

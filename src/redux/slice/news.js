@@ -13,8 +13,8 @@ export const fetchNews = createAsyncThunk(
             'everything?apiKey=' +
             APIs.API_KEY + '&q=' + searchQuery
         : APIs.BASE_URL +
-            'top-headlines?country=in&apiKey=' +
-            APIs.API_KEY,
+            'top-headlines?country=us&apiKey=' +
+            APIs.API_KEY + categoryParam
     );
     console.log('Request: ', response.url.toString());
     return response.json();

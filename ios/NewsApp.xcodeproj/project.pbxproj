@@ -17,6 +17,7 @@
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		A76E6B492DDCAD853822A66B /* Pods_NewsApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C623DC3A391DE87969FD82F8 /* Pods_NewsApp.framework */; };
 		C38724AAC9CB9EAAA4DE5390 /* Pods_NewsApp_NewsAppTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 412F1AEA0B0C25A6CDFA9F26 /* Pods_NewsApp_NewsAppTests.framework */; };
+		DA90052B29BB634300088B1C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DA90052A29BB634100088B1C /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -65,6 +66,7 @@
 		DA2B7F48297E610400DD4C0D /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
 		DA2B7F49297E610400DD4C0D /* AntDesign.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		DA2B7F4A297E610400DD4C0D /* Octicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Octicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Octicons.ttf"; sourceTree = "<group>"; };
+		DA90052A29BB634100088B1C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -164,6 +166,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				DA90052A29BB634100088B1C /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* NewsApp */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* NewsAppTests */,
@@ -295,6 +298,7 @@
 				1F44BAF58971438FB135FA77 /* NanumMyeongjo-Bold.ttf in Resources */,
 				67339950EC6F4CB08FCA0E25 /* NanumMyeongjo-ExtraBold.ttf in Resources */,
 				2F7206C298704098AE2BCE22 /* NanumMyeongjo-Regular.ttf in Resources */,
+				DA90052B29BB634300088B1C /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

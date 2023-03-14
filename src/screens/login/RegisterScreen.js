@@ -17,6 +17,7 @@ import {Colors, Fonts, Images} from '../../constants';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import auth from '@react-native-firebase/auth';
 
 const RegisterScreen = () => {
   const insets = useSafeAreaInsets();
@@ -41,11 +42,45 @@ const RegisterScreen = () => {
       console.log('Name:', name);
       console.log('Email:', email);
       console.log('Password:', password);
+      register(name, email, password);
     }
   };
 
   const backButtonAction = () => {
     navigation.goBack();
+  };
+
+  const register = (name, email, password) => {
+    auth()
+      .createUserWithEmailAndPassword(email, password)
+      .then(user => {
+        console.log('Registration Successful. Please Login to proceed');
+        console.log('New user: ', user);
+        if (user) {
+          auth()
+            .currentUser.updateProfile({
+              displayName: name,
+            })
+            .then(() => {
+              navigation.reset({
+                index: 0,
+                routes: [{name: 'DashBoardTabs'}],
+              });
+            })
+            .catch(error => {
+              Alert.alert(error);
+              console.error(error);
+            });
+        }
+      })
+      .catch(error => {
+        console.log(error);
+        if (error.code === 'auth/email-already-in-use') {
+          Alert.alert('That email address is already in use!');
+        } else {
+          Alert.alert(error.message);
+        }
+      });
   };
 
   return (

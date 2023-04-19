@@ -10,6 +10,7 @@ import {
   StatusBar,
   SafeAreaView,
   Text,
+  ActivityIndicator,
 } from 'react-native';
 import Lottie from 'lottie-react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -18,6 +19,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import auth from '@react-native-firebase/auth';
+import * as Helpers from '../../helpers/Helpers';
 
 const RegisterScreen = () => {
   const insets = useSafeAreaInsets();
@@ -27,18 +29,18 @@ const RegisterScreen = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = () => {
     if (!name) {
-      Alert.alert('Name is required');
+      Helpers.showToast('Please enter your name', 'Name is required', 'info');
     } else if (!email) {
-      Alert.alert('Email is required');
+      Helpers.showToast('Please enter your email', 'Email is required', 'info');
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      Alert.alert('Invalid email');
+      Helpers.showToast('Please enter valid email address', 'Invalid email', 'info');
     } else if (!password) {
-      Alert.alert('Password is required');
+      Helpers.showToast('Please enter password', 'Password is required', 'info');
     } else {
-      // Handle login logic here, such as validating email and password against a database or API
       console.log('Name:', name);
       console.log('Email:', email);
       console.log('Password:', password);
@@ -51,10 +53,17 @@ const RegisterScreen = () => {
   };
 
   const register = (name, email, password) => {
+    setIsLoading(true);
     auth()
       .createUserWithEmailAndPassword(email, password)
       .then(user => {
+        setIsLoading(false);
         console.log('Registration Successful. Please Login to proceed');
+        Helpers.showToast(
+          'Registration Successful!! Please wait..',
+          'Success',
+          'success',
+        );
         console.log('New user: ', user);
         if (user) {
           auth()
@@ -68,17 +77,22 @@ const RegisterScreen = () => {
               });
             })
             .catch(error => {
-              Alert.alert(error);
+              Helpers.showToast(error, 'Error', 'error');
               console.error(error);
             });
         }
       })
       .catch(error => {
+        setIsLoading(false);
         console.log(error);
         if (error.code === 'auth/email-already-in-use') {
-          Alert.alert('That email address is already in use!');
+          Helpers.showToast(
+            'That email address is already in use!',
+            'Error',
+            'error',
+          );
         } else {
-          Alert.alert(error.message);
+          Helpers.showToast(error.message, 'Error', 'error');
         }
       });
   };
@@ -86,6 +100,12 @@ const RegisterScreen = () => {
   return (
     <>
       <StatusBar barStyle="dark-content" />
+      {isLoading ? (
+        <View style={styles.loader}>
+          <ActivityIndicator size="large" color={Colors.WHITE_COLOR} />
+        </View>
+      ) : null}
+
       <SafeAreaView>
         <View
           style={{
@@ -216,6 +236,17 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 5,
     width: '80%',
+  },
+  loader: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1,
+    backgroundColor: '#00000080',
   },
 });
 

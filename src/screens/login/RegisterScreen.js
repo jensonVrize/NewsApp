@@ -18,8 +18,10 @@ import {Colors, Fonts, Images} from '../../constants';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import auth from '@react-native-firebase/auth';
 import * as Helpers from '../../helpers/Helpers';
+
+import {useDispatch, useSelector} from 'react-redux';
+import {signUp} from '../../services/authServices';
 
 const RegisterScreen = () => {
   const insets = useSafeAreaInsets();
@@ -29,7 +31,10 @@ const RegisterScreen = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+
+  const dispatch = useDispatch();
+  const state = useSelector(state => state.auth);
+  console.log('Register screen State: ', state);
 
   const handleLogin = () => {
     if (!name) {
@@ -37,21 +42,67 @@ const RegisterScreen = () => {
     } else if (!email) {
       Helpers.showToast('Please enter your email', 'Email is required', 'info');
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      Helpers.showToast('Please enter valid email address', 'Invalid email', 'info');
+      Helpers.showToast(
+        'Please enter valid email address',
+        'Invalid email',
+        'info',
+      );
     } else if (!password) {
-      Helpers.showToast('Please enter password', 'Password is required', 'info');
+      Helpers.showToast(
+        'Please enter password',
+        'Password is required',
+        'info',
+      );
     } else {
       console.log('Name:', name);
       console.log('Email:', email);
       console.log('Password:', password);
-      register(name, email, password);
+
+      dispatch(signUp({name, email, password}))
+        .then(resState => {
+          console.log('resState: ', resState);
+          if (resState?.user) {
+            console.log('User register successss!!: user: ', resState.user);
+            Helpers.showToast(
+              'Registration Successful!!',
+              '✅ Success',
+              'success',
+            );
+
+            //Navigate to home
+            navigation.reset({
+              index: 0,
+              routes: [{name: 'DashBoardTabs'}],
+            });
+
+          } else if (resState?.error) {
+            if (resState.error.code === 'auth/email-already-in-use') {
+              Helpers.showToast(
+                'That email address is already in use!',
+                '😔 Sorry..',
+                'error',
+              );
+            } else if (resState.error.code === 'auth/weak-password'){
+              Helpers.showToast('Password must be at least 6 characteres.', '❌ Invalid password', 'error');
+            } else {
+              Helpers.showToast(resState.error.message, 'Error', 'error');
+            }
+          } else {
+            Helpers.showToast('User register failed!', 'Error', 'error');
+            console.log('User register failed!');
+          }
+        })
+        .catch(error => {
+          Helpers.showToast(error, 'Error', 'error');
+          console.log('Sign up failed:', error);
+        });
     }
   };
 
   const backButtonAction = () => {
     navigation.goBack();
   };
-
+  /*
   const register = (name, email, password) => {
     setIsLoading(true);
     auth()
@@ -96,11 +147,12 @@ const RegisterScreen = () => {
         }
       });
   };
+*/
 
   return (
     <>
       <StatusBar barStyle="dark-content" />
-      {isLoading ? (
+      {state.loading ? (
         <View style={styles.loader}>
           <ActivityIndicator size="large" color={Colors.WHITE_COLOR} />
         </View>

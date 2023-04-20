@@ -23,51 +23,6 @@ export const signUp =
     }
   };
 
-/*
-export const signUp =
-  ({name, email, password}) =>
-  async dispatch => {
-    try {
-      dispatch(setLoading(true));
-
-      await auth()
-        .createUserWithEmailAndPassword(email, password)
-        .then(() => {
-          console.log('User account created successfully!');
-          // Update user's name
-          const currentUser = auth().currentUser;
-          console.log('New user: ', currentUser);
-          currentUser
-            .updateProfile({
-              displayName: name,
-            })
-            .then(() => {
-              const user = auth().currentUser;
-              console.log('User profile updated successfully!');
-              console.log('updated user: ', user);
-              dispatch(setUser(user));
-              return {user: user, error: null};
-            })
-            .catch(error => {
-              console.log('Error updating user profile:', error);
-              dispatch(setError(error.message));
-              return {user: null, error: error};
-            });
-        })
-        .catch(error => {
-          console.log('Error creating user account:', error);
-          dispatch(setError(error.message));
-          return {user: null, error: error};
-        });
-    } catch (error) {
-      console.log('New user error : ', error.message);
-      dispatch(setError(error.message));
-      return {user: null, error: error};
-    } finally {
-      dispatch(setLoading(false));
-    }
-  };
-*/
 export const signIn =
   ({email, password}) =>
   async dispatch => {

@@ -23,6 +23,7 @@ import moment from 'moment';
 import {categoriesData} from './categoryData/CategoryData';
 import AsyncStore, {AsyncStoreKeyMap} from '../../utils/AsyncStore';
 import * as Helpers from '../../helpers/Helpers';
+import Globals from '../../helpers/Globals';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -46,17 +47,11 @@ const HomeScreen = () => {
   };
 
   const userIconTouched = () => {
-    AsyncStore.getObjectValue(AsyncStoreKeyMap.isAuthorizerd).then(
-      isAuthorized => {
-        console.log('Home isAuthorized: ', isAuthorized);
-        if (isAuthorized == true) {
-          Helpers.showToast('User is already Logged', 'Message', 'info');
-          AsyncStore.storeData(AsyncStoreKeyMap.isAuthorizerd, false);
-        } else {
-          navigation.navigate('LoginScreen');
-        }
-      },
-    );
+    if (Globals.IS_AUTH == true) {
+      navigation.navigate('ProfileScreen');
+    } else {
+      navigation.navigate('LoginScreen');
+    }
   };
 
   const CategoryItem = ({fullData}) => {

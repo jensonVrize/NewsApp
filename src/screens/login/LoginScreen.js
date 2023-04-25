@@ -19,9 +19,10 @@ import {ScrollView} from 'react-native-gesture-handler';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import * as Helpers from '../../helpers/Helpers';
-import AsyncStore, { AsyncStoreKeyMap } from '../../utils/AsyncStore';
+import AsyncStore, {AsyncStoreKeyMap} from '../../utils/AsyncStore';
 import {useDispatch, useSelector} from 'react-redux';
 import {signIn} from '../../services/authServices';
+import Globals from '../../helpers/Globals';
 
 const LoginScreen = () => {
   const insets = useSafeAreaInsets();
@@ -50,7 +51,6 @@ const LoginScreen = () => {
         'info',
       );
     } else {
-     
       console.log('Email:', email);
       console.log('Password:', password);
 
@@ -61,28 +61,44 @@ const LoginScreen = () => {
             console.log('User login successss!!: user: ', resState.user);
             //Save logged in status and info in local storage
             AsyncStore.storeData(AsyncStoreKeyMap.isAuthorizerd, true);
-            AsyncStore.storeData(AsyncStoreKeyMap.userInfo, resState.user?._user);
-            Helpers.showToast(
-              'Login Successful!!',
-              '✅ Success',
-              'success',
+            AsyncStore.storeData(
+              AsyncStoreKeyMap.userInfo,
+              resState.user?._user,
             );
+            Globals.IS_AUTH = true;
+            Globals.USER_INFO = resState.user?._user;
+            Helpers.showToast('Login Successful!!', '✅ Success', 'success');
 
             //Navigate to home
             navigation.reset({
               index: 0,
               routes: [{name: 'DashBoardTabs'}],
             });
-
           } else if (resState?.error) {
-            if (resState.error.code === 'auth/wrong-password'){
-              Helpers.showToast('Please enter the correct password', '❌ Incorrect password', 'error');
-            } else if (resState.error.code === 'auth/user-not-found'){
-              Helpers.showToast('No account found on this email address', '❌ No account found', 'error');
-            } else if (resState.error.code === 'auth/too-many-requests'){
-              Helpers.showToast('Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later.', 'Account disabled temporarily', 'info');
-            } else if (resState.error.code === 'auth/user-disabled'){
-              Helpers.showToast('The user account has been disabled by an administrator.', '❌ Account disabled', 'error');
+            if (resState.error.code === 'auth/wrong-password') {
+              Helpers.showToast(
+                'Please enter the correct password',
+                '❌ Incorrect password',
+                'error',
+              );
+            } else if (resState.error.code === 'auth/user-not-found') {
+              Helpers.showToast(
+                'No account found on this email address',
+                '❌ No account found',
+                'error',
+              );
+            } else if (resState.error.code === 'auth/too-many-requests') {
+              Helpers.showToast(
+                'Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later.',
+                'Account disabled temporarily',
+                'info',
+              );
+            } else if (resState.error.code === 'auth/user-disabled') {
+              Helpers.showToast(
+                'The user account has been disabled by an administrator.',
+                '❌ Account disabled',
+                'error',
+              );
             } else {
               Helpers.showToast(resState.error.message, 'Error', 'error');
             }
@@ -95,12 +111,18 @@ const LoginScreen = () => {
           Helpers.showToast(error, 'Error', 'error');
           console.log('Sign in failed:', error);
         });
-
     }
   };
 
   const backButtonAction = () => {
-    navigation.goBack();
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.reset({
+        index: 0,
+        routes: [{name: 'DashBoardTabs'}],
+      });
+    }
   };
 
   return (

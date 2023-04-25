@@ -46,8 +46,10 @@ export const signOut = () => async dispatch => {
     await auth().signOut();
 
     dispatch(setUser(null));
+    return {isSuccess: true, error: null}
   } catch (error) {
     dispatch(setError(error.message));
+    return {isSuccess: false, error: error}
   } finally {
     dispatch(setLoading(false));
   }

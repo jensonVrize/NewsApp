@@ -22,6 +22,7 @@ import * as Helpers from '../../helpers/Helpers';
 import AsyncStore, { AsyncStoreKeyMap } from '../../utils/AsyncStore';
 import {useDispatch, useSelector} from 'react-redux';
 import {signUp} from '../../services/authServices';
+import Globals from '../../helpers/Globals';
 
 const RegisterScreen = () => {
   const insets = useSafeAreaInsets();
@@ -62,8 +63,12 @@ const RegisterScreen = () => {
           console.log('resState: ', resState);
           if (resState?.user) {
             console.log('User register successss!!: user: ', resState.user);
-            //Save logged in status in storage
-            AsyncStore.storeData(AsyncStoreKeyMap.isAuthorizerd, true);
+           //Save logged in status and info in local storage
+           AsyncStore.storeData(AsyncStoreKeyMap.isAuthorizerd, true);
+           AsyncStore.storeData(AsyncStoreKeyMap.userInfo, resState.user?._user);
+           Globals.IS_AUTH = true;
+           Globals.USER_INFO = resState.user?._user;
+
             Helpers.showToast(
               'Registration Successful!!',
               '✅ Success',

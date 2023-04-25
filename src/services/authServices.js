@@ -28,12 +28,12 @@ export const signIn =
   async dispatch => {
     try {
       dispatch(setLoading(true));
-
       const {user} = await auth().signInWithEmailAndPassword(email, password);
-
       dispatch(setUser(user));
+      return {user: user, error: null};
     } catch (error) {
       dispatch(setError(error.message));
+      return {user: null, error: error};
     } finally {
       dispatch(setLoading(false));
     }

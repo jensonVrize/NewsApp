@@ -20,7 +20,9 @@ import {useDispatch, useSelector} from 'react-redux';
 import {fetchNews} from '../../redux/slice/news';
 import uniqueId from 'lodash.uniqueid';
 import moment from 'moment';
-import { categoriesData } from './categoryData/CategoryData';
+import {categoriesData} from './categoryData/CategoryData';
+import AsyncStore, {AsyncStoreKeyMap} from '../../utils/AsyncStore';
+import * as Helpers from '../../helpers/Helpers';
 
 const HomeScreen = () => {
   const navigation = useNavigation();
@@ -28,12 +30,8 @@ const HomeScreen = () => {
   const dispatch = useDispatch();
   const state = useSelector(state => state);
 
-  console.log('HomeScreen State: ', state);
-
   useEffect(() => {
-    dispatch(
-      fetchNews({category: '', isSearch: false, searchQuery: 'asd'}),
-    );
+    dispatch(fetchNews({category: '', isSearch: false, searchQuery: 'asd'}));
   }, []);
 
   const renderCategories = ({item}) => <CategoryItem fullData={item} />;
@@ -43,68 +41,76 @@ const HomeScreen = () => {
     return item.id || `item-${uniqueId()}`;
   };
 
-  const categoryItemTouched = (category) => {
+  const categoryItemTouched = category => {
     navigation.navigate('CategoryNewsListScreen', {category});
-  }
+  };
 
   const userIconTouched = () => {
-    navigation.navigate('LoginScreen');
-  }
-
+    AsyncStore.getObjectValue(AsyncStoreKeyMap.isAuthorizerd).then(
+      isAuthorized => {
+        console.log('Home isAuthorized: ', isAuthorized);
+        if (isAuthorized == true) {
+          Helpers.showToast('User is already Logged', 'Message', 'info');
+          AsyncStore.storeData(AsyncStoreKeyMap.isAuthorizerd, false);
+        } else {
+          navigation.navigate('LoginScreen');
+        }
+      },
+    );
+  };
 
   const CategoryItem = ({fullData}) => {
     return (
-      <TouchableOpacity onPress={() => categoryItemTouched(fullData.title) }>
-      <FastImage
-        style={{
-          width: 120,
-          height: 90,
-          borderRadius: 16,
-          borderWidth: 4,
-          borderColor: Colors.APP_PRIMARY_COLOR,
-          marginLeft: 8,
-          alignItems: 'center',
-        }}
-        source={{
-          uri: fullData.image,
-          priority: FastImage.priority.normal,
-        }}
-        resizeMode={FastImage.resizeMode.cover}>
-        <View
+      <TouchableOpacity onPress={() => categoryItemTouched(fullData.title)}>
+        <FastImage
           style={{
-            width: '100%',
-            height: '30%',
-            position: 'absolute',
-            bottom: 0,
-            backgroundColor: Colors.SEMI_TRANSPARENT,
-            justifyContent: 'center',
-          }}>
-          <Text
+            width: 120,
+            height: 90,
+            borderRadius: 16,
+            borderWidth: 4,
+            borderColor: Colors.APP_PRIMARY_COLOR,
+            marginLeft: 8,
+            alignItems: 'center',
+          }}
+          source={{
+            uri: fullData.image,
+            priority: FastImage.priority.normal,
+          }}
+          resizeMode={FastImage.resizeMode.cover}>
+          <View
             style={{
-              color: Colors.WHITE_COLOR,
-              fontFamily: Fonts.NANUM_BOLD,
-              fontSize: 12,
-              textAlign: 'center',
-            }}
-            numberOfLines={1}>
-            {fullData.title}
-          </Text>
-        </View>
-      </FastImage>
+              width: '100%',
+              height: '30%',
+              position: 'absolute',
+              bottom: 0,
+              backgroundColor: Colors.SEMI_TRANSPARENT,
+              justifyContent: 'center',
+            }}>
+            <Text
+              style={{
+                color: Colors.WHITE_COLOR,
+                fontFamily: Fonts.NANUM_BOLD,
+                fontSize: 12,
+                textAlign: 'center',
+              }}
+              numberOfLines={1}>
+              {fullData.title}
+            </Text>
+          </View>
+        </FastImage>
       </TouchableOpacity>
     );
   };
 
-  const newsItemTouched = (newsDetails) => {
+  const newsItemTouched = newsDetails => {
     navigation.navigate('NewsDetailsScreen', {newsDetails});
-  }
+  };
 
   const HeadlineItem = ({fullData}) => {
     return (
-      <TouchableOpacity style={{marginLeft: 8, marginRight: 8, marginBottom: 16}}
-      onPress={() => newsItemTouched(fullData)}
-      >
-        
+      <TouchableOpacity
+        style={{marginLeft: 8, marginRight: 8, marginBottom: 16}}
+        onPress={() => newsItemTouched(fullData)}>
         <FastImage
           style={{
             flex: 1,
@@ -259,10 +265,12 @@ const HomeScreen = () => {
 
           <FlatList
             style={{marginTop: 8, backgroundColor: Colors.CLEAR}}
-            data={state.news?.data?.articles?.slice(0, 15)?.map((item, index) => ({
-              key: keyExtractor(item, index),
-              ...item,
-            }))}
+            data={state.news?.data?.articles
+              ?.slice(0, 15)
+              ?.map((item, index) => ({
+                key: keyExtractor(item, index),
+                ...item,
+              }))}
             renderItem={renderHeadlines}
             keyExtractor={keyExtractor}
           />

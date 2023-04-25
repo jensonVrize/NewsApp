@@ -12,6 +12,8 @@ import {
 } from 'react-native';
 import {Platform} from 'react-native';
 import KeyboardManager from 'react-native-keyboard-manager';
+import Globals from '../../helpers/Globals';
+import AsyncStore, { AsyncStoreKeyMap } from '../../utils/AsyncStore';
 
 const SplashScreen = () => {
   const navigation = useNavigation();
@@ -20,6 +22,26 @@ const SplashScreen = () => {
     KeyboardManager.setToolbarTintColor(Colors.APP_PRIMARY_COLOR); 
   }
   useEffect(() => {
+
+    //Load auth, userInfo from local DB to Globals
+    AsyncStore.getObjectValue(AsyncStoreKeyMap.isAuthorizerd).then(
+      isAuthorized => {
+        console.log('Splash isAuthorized: ', isAuthorized);
+        if (isAuthorized == true) {
+          Globals.IS_AUTH = true
+          //Reading userInfo
+          AsyncStore.getObjectValue(AsyncStoreKeyMap.userInfo).then(
+            userInfo => {
+              console.log('Splash userInfo: ', userInfo);
+              Globals.USER_INFO = userInfo;
+            },
+          );
+        } else {
+          Globals.IS_AUTH = false
+        }
+      },
+    );
+
     setTimeout(() => {
       navigation.reset({
         index: 0,

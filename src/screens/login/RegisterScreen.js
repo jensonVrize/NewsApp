@@ -19,7 +19,7 @@ import {ScrollView} from 'react-native-gesture-handler';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import * as Helpers from '../../helpers/Helpers';
-
+import AsyncStore, { AsyncStoreKeyMap } from '../../utils/AsyncStore';
 import {useDispatch, useSelector} from 'react-redux';
 import {signUp} from '../../services/authServices';
 
@@ -34,7 +34,6 @@ const RegisterScreen = () => {
 
   const dispatch = useDispatch();
   const state = useSelector(state => state.auth);
-  console.log('Register screen State: ', state);
 
   const handleLogin = () => {
     if (!name) {
@@ -63,6 +62,8 @@ const RegisterScreen = () => {
           console.log('resState: ', resState);
           if (resState?.user) {
             console.log('User register successss!!: user: ', resState.user);
+            //Save logged in status in storage
+            AsyncStore.storeData(AsyncStoreKeyMap.isAuthorizerd, true);
             Helpers.showToast(
               'Registration Successful!!',
               '✅ Success',

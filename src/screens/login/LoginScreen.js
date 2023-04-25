@@ -10,6 +10,7 @@ import {
   StatusBar,
   SafeAreaView,
   Text,
+  ActivityIndicator,
 } from 'react-native';
 import Lottie from 'lottie-react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -17,6 +18,10 @@ import {Colors, Fonts, Images} from '../../constants';
 import {ScrollView} from 'react-native-gesture-handler';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
+import * as Helpers from '../../helpers/Helpers';
+import AsyncStore, { AsyncStoreKeyMap } from '../../utils/AsyncStore';
+import {useDispatch, useSelector} from 'react-redux';
+import {signIn} from '../../services/authServices';
 
 const LoginScreen = () => {
   const insets = useSafeAreaInsets();
@@ -26,17 +31,71 @@ const LoginScreen = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
+  const dispatch = useDispatch();
+  const state = useSelector(state => state.auth);
+
   const handleLogin = () => {
     if (!email) {
-      Alert.alert('Email is required');
+      Helpers.showToast('Please enter your email', 'Email is required', 'info');
     } else if (!/\S+@\S+\.\S+/.test(email)) {
-      Alert.alert('Invalid email');
+      Helpers.showToast(
+        'Please enter valid email address',
+        'Invalid email',
+        'info',
+      );
     } else if (!password) {
-      Alert.alert('Password is required');
+      Helpers.showToast(
+        'Please enter password',
+        'Password is required',
+        'info',
+      );
     } else {
-      // Handle login logic here, such as validating email and password against a database or API
+     
       console.log('Email:', email);
       console.log('Password:', password);
+
+      dispatch(signIn({email, password}))
+        .then(resState => {
+          console.log('resState: ', resState);
+          if (resState?.user) {
+            console.log('User login successss!!: user: ', resState.user);
+            //Save logged in status and info in local storage
+            AsyncStore.storeData(AsyncStoreKeyMap.isAuthorizerd, true);
+            AsyncStore.storeData(AsyncStoreKeyMap.userInfo, resState.user?._user);
+            Helpers.showToast(
+              'Login Successful!!',
+              '✅ Success',
+              'success',
+            );
+
+            //Navigate to home
+            navigation.reset({
+              index: 0,
+              routes: [{name: 'DashBoardTabs'}],
+            });
+
+          } else if (resState?.error) {
+            if (resState.error.code === 'auth/wrong-password'){
+              Helpers.showToast('Please enter the correct password', '❌ Incorrect password', 'error');
+            } else if (resState.error.code === 'auth/user-not-found'){
+              Helpers.showToast('No account found on this email address', '❌ No account found', 'error');
+            } else if (resState.error.code === 'auth/too-many-requests'){
+              Helpers.showToast('Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later.', 'Account disabled temporarily', 'info');
+            } else if (resState.error.code === 'auth/user-disabled'){
+              Helpers.showToast('The user account has been disabled by an administrator.', '❌ Account disabled', 'error');
+            } else {
+              Helpers.showToast(resState.error.message, 'Error', 'error');
+            }
+          } else {
+            Helpers.showToast('User login failed!', 'Error', 'error');
+            console.log('User login failed!');
+          }
+        })
+        .catch(error => {
+          Helpers.showToast(error, 'Error', 'error');
+          console.log('Sign in failed:', error);
+        });
+
     }
   };
 
@@ -47,6 +106,11 @@ const LoginScreen = () => {
   return (
     <>
       <StatusBar barStyle="dark-content" />
+      {state.loading ? (
+        <View style={styles.loader}>
+          <ActivityIndicator size="large" color={Colors.WHITE_COLOR} />
+        </View>
+      ) : null}
       <SafeAreaView>
         <View
           style={{
@@ -169,6 +233,17 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 5,
     width: '80%',
+  },
+  loader: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1,
+    backgroundColor: '#00000080',
   },
 });
 

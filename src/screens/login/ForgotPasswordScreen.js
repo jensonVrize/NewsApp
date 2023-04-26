@@ -21,21 +21,20 @@ import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
 import * as Helpers from '../../helpers/Helpers';
 import AsyncStore, {AsyncStoreKeyMap} from '../../utils/AsyncStore';
 import {useDispatch, useSelector} from 'react-redux';
-import {signIn} from '../../services/authServices';
+import {forgotPassword} from '../../services/authServices';
 import Globals from '../../helpers/Globals';
 
-const LoginScreen = () => {
+const ForgotPasswordScreen = () => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const route = useRoute();
   const [contentBottom, setContentBottom] = useState(0);
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
   const dispatch = useDispatch();
   const state = useSelector(state => state.auth);
 
-  const handleLogin = () => {
+  const handleForgotPassword = () => {
     if (!email) {
       Helpers.showToast('Please enter your email', 'Email is required', 'info');
     } else if (!/\S+@\S+\.\S+/.test(email)) {
@@ -44,44 +43,36 @@ const LoginScreen = () => {
         'Invalid email',
         'info',
       );
-    } else if (!password) {
-      Helpers.showToast(
-        'Please enter password',
-        'Password is required',
-        'info',
-      );
     } else {
       console.log('Email:', email);
-      console.log('Password:', password);
 
-      dispatch(signIn({email, password}))
+      dispatch(forgotPassword({email}))
         .then(resState => {
           console.log('resState: ', resState);
-          if (resState?.user) {
-            console.log('User login successss!!: user: ', resState.user);
-            //Save logged in status and info in local storage
-            AsyncStore.storeData(AsyncStoreKeyMap.isAuthorizerd, true);
-            AsyncStore.storeData(
-              AsyncStoreKeyMap.userInfo,
-              resState.user?._user,
+          if (resState?.isSuccess === true) {
+            console.log('Forgot password successss!!: user: ');
+            Helpers.showToast(
+              'Please check your email for reset link',
+              'Reset link send to email',
+              'info',
             );
-            Globals.IS_AUTH = true;
-            Globals.USER_INFO = resState.user?._user;
-            Helpers.showToast('Login Successful!!', '✅ Success', 'success');
 
-            //Navigate to home
-            navigation.reset({
-              index: 0,
-              routes: [{name: 'DashBoardTabs'}],
-            });
+            Alert.alert(
+              'Reset link send successfully!',
+              'Please check your email and follow the instructions.',
+              [
+                {
+                  text: 'OK',
+                  onPress: () => {
+                    console.log('OK Pressed');
+                    navigation.goBack();
+                  },
+                },
+              ],
+              {cancelable: false},
+            );
           } else if (resState?.error) {
-            if (resState.error.code === 'auth/wrong-password') {
-              Helpers.showToast(
-                'Please enter the correct password',
-                '❌ Incorrect password',
-                'error',
-              );
-            } else if (resState.error.code === 'auth/user-not-found') {
+            if (resState.error.code === 'auth/user-not-found') {
               Helpers.showToast(
                 'No account found on this email address',
                 '❌ No account found',
@@ -184,35 +175,7 @@ const LoginScreen = () => {
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
-              <TextInput
-                style={styles.input}
-                placeholder="Password"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                autoCapitalize="none"
-              />
-              <View style={{marginTop: 8, flexDirection: 'row', alignSelf: 'flex-end', marginRight: '10%'}}>
-                <Text
-                  style={{
-                    fontSize: 12,
-                    color: Colors.BLACK_COLOR,
-                  }}>
-                  Forgot Password?
-                </Text>
-                <TouchableOpacity
-                  style={{marginLeft: 4}}
-                  onPress={() => navigation.navigate('ForgotPasswordScreen')}>
-                  <Text
-                    style={{
-                      color: Colors.APP_PRIMARY_COLOR,
-                      fontSize: 12,
-                      fontWeight: 'bold',
-                    }}>
-                    Reset now
-                  </Text>
-                </TouchableOpacity>
-              </View>
+
               <TouchableOpacity
                 style={{
                   marginTop: 25,
@@ -222,7 +185,7 @@ const LoginScreen = () => {
                   justifyContent: 'center',
                   borderRadius: 5,
                 }}
-                onPress={handleLogin}>
+                onPress={() => handleForgotPassword()}>
                 <Text
                   style={{
                     fontSize: 14,
@@ -230,30 +193,10 @@ const LoginScreen = () => {
                     color: Colors.WHITE_COLOR,
                     alignSelf: 'center',
                   }}>
-                  Login
+                  Get Reset Link
                 </Text>
               </TouchableOpacity>
-              <View style={{marginTop: 12, flexDirection: 'row'}}>
-                <Text
-                  style={{
-                    fontSize: 12,
-                    color: Colors.BLACK_COLOR,
-                  }}>
-                  New user?
-                </Text>
-                <TouchableOpacity
-                  style={{marginLeft: 4}}
-                  onPress={() => navigation.navigate('RegisterScreen')}>
-                  <Text
-                    style={{
-                      color: Colors.APP_PRIMARY_COLOR,
-                      fontSize: 12,
-                      fontWeight: 'bold',
-                    }}>
-                    Register now
-                  </Text>
-                </TouchableOpacity>
-              </View>
+
               <View style={{flex: 1}} />
             </View>
           </ScrollView>
@@ -290,4 +233,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginScreen;
+export default ForgotPasswordScreen;

@@ -5,6 +5,7 @@ import CategoryNewsListScreen from './categoryNewsList/CategoryNewsListScreen'
 import LoginScreen from './login/LoginScreen'
 import RegisterScreen from './login/RegisterScreen'
 import ProfileScreen from './profile/ProfileScreen'
+import ForgotPasswordScreen from './login/ForgotPasswordScreen'
 export {
     SplashScreen, 
     HomeScreen,
@@ -13,4 +14,5 @@ export {
     LoginScreen,
     RegisterScreen,
     ProfileScreen,
+    ForgotPasswordScreen,
 }

@@ -11,6 +11,7 @@ import {
   LoginScreen,
   RegisterScreen,
   ProfileScreen,
+  ForgotPasswordScreen,
 } from '../../screens';
 import DashBoardTabs from '../tabNavigatior/DashboardTabs';
 
@@ -40,6 +41,7 @@ const RootStack = () => {
           component={CategoryNewsListScreen}
         />
         <Stack.Screen name="ProfileScreen" component={ProfileScreen} />
+        <Stack.Screen name="ForgotPasswordScreen" component={ForgotPasswordScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

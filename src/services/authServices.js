@@ -46,11 +46,26 @@ export const signOut = () => async dispatch => {
     await auth().signOut();
 
     dispatch(setUser(null));
-    return {isSuccess: true, error: null}
+    return {isSuccess: true, error: null};
   } catch (error) {
     dispatch(setError(error.message));
-    return {isSuccess: false, error: error}
+    return {isSuccess: false, error: error};
   } finally {
     dispatch(setLoading(false));
   }
 };
+
+export const forgotPassword =
+  ({email}) =>
+  async dispatch => {
+    try {
+      dispatch(setLoading(true));
+      await auth().sendPasswordResetEmail(email);
+      return {isSuccess: true, error: null};
+    } catch (error) {
+      dispatch(setError(error.message));
+      return {isSuccess: false, error: error};
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };

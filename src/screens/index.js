@@ -6,6 +6,7 @@ import LoginScreen from './login/LoginScreen'
 import RegisterScreen from './login/RegisterScreen'
 import ProfileScreen from './profile/ProfileScreen'
 import ForgotPasswordScreen from './login/ForgotPasswordScreen'
+import SettingsScreen from './settings/SettingsScreen'
 export {
     SplashScreen, 
     HomeScreen,
@@ -15,4 +16,5 @@ export {
     RegisterScreen,
     ProfileScreen,
     ForgotPasswordScreen,
+    SettingsScreen,
 }

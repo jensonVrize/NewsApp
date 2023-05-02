@@ -16,9 +16,10 @@ import {
   LogBox,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import {fetchNews} from '../../redux/slice/news';
+import {fetchCategoryNews} from '../../redux/slice/categoryNews';
 import uniqueId from 'lodash.uniqueid';
 import moment from 'moment';
+import * as Helpers from '../../helpers/Helpers';
 
 const CategoryNewsListScreen = () => {
   const navigation = useNavigation();
@@ -26,24 +27,19 @@ const CategoryNewsListScreen = () => {
   const insets = useSafeAreaInsets();
   const dispatch = useDispatch();
   const selectedCategory = route.params.category;
-
   const state = useSelector(state => state);
 
-  console.log('CategoryNewsListScreen State: ', state);
-
   useEffect(() => {
-    dispatch(
-      fetchNews({category: selectedCategory, isSearch: false, searchQuery: 'asd'}),
-    );
+    dispatch(fetchCategoryNews({category: selectedCategory}));
   }, []);
 
   //ACTIONS
   const backButtonAction = () => {
     navigation.goBack();
   };
-  const newsItemTouched = (newsDetails) => {
+  const newsItemTouched = newsDetails => {
     navigation.navigate('NewsDetailsScreen', {newsDetails});
-  }
+  };
 
   const renderHeadlines = ({item}) => <HeadlineItem fullData={item} />;
 
@@ -52,7 +48,9 @@ const CategoryNewsListScreen = () => {
   };
 
   const HeadlineItem = ({fullData}) => {
-    return (
+    return state.categoryNews.isLoading === true ? (
+      <Helpers.NewsLoader />
+    ) : (
       <TouchableOpacity
         style={{marginLeft: 8, marginRight: 8, marginBottom: 16}}
         onPress={() => newsItemTouched(fullData)}>
@@ -166,7 +164,14 @@ const CategoryNewsListScreen = () => {
               />
             </TouchableOpacity>
 
-            <Text style={{color: Colors.PRIMARY_TEXT_COLOR, fontSize: 16, fontWeight: 'bold'}}>{selectedCategory || 'Category News'}</Text>
+            <Text
+              style={{
+                color: Colors.PRIMARY_TEXT_COLOR,
+                fontSize: 16,
+                fontWeight: 'bold',
+              }}>
+              {selectedCategory || 'Category News'}
+            </Text>
 
             <TouchableOpacity>
               <Image
@@ -182,14 +187,19 @@ const CategoryNewsListScreen = () => {
 
           <FlatList
             style={{marginTop: 8, backgroundColor: Colors.CLEAR}}
-            data={state.news?.data?.articles?.slice(0, 15)?.map((item, index) => ({
-              key: keyExtractor(item, index),
-              ...item,
-            }))}
+            data={
+              state.categoryNews.isLoading === true
+                ? Helpers.DUMMY_LOAD_DATA
+                : state.categoryNews?.data?.articles
+                    ?.slice(0, 15)
+                    ?.map((item, index) => ({
+                      key: keyExtractor(item, index),
+                      ...item,
+                    }))
+            }
             renderItem={renderHeadlines}
             keyExtractor={keyExtractor}
           />
-
         </View>
       </SafeAreaView>
     </>

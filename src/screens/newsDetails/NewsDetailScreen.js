@@ -5,7 +5,6 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {Colors, Fonts, Images} from '../../constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FastImage from 'react-native-fast-image';
-import SkeletonContent from 'react-native-skeleton-content-nonexpo';
 import {WebView} from 'react-native-webview';
 import {
   View,

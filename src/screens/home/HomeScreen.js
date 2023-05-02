@@ -5,7 +5,6 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {Colors, Fonts, Images} from '../../constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import FastImage from 'react-native-fast-image';
-import SkeletonContent from 'react-native-skeleton-content-nonexpo';
 import {
   View,
   SafeAreaView,
@@ -102,7 +101,9 @@ const HomeScreen = () => {
   };
 
   const HeadlineItem = ({fullData}) => {
-    return (
+    return state.news.isLoading === true ? (
+      <Helpers.NewsLoader />
+    ) : (
       <TouchableOpacity
         style={{marginLeft: 8, marginRight: 8, marginBottom: 16}}
         onPress={() => newsItemTouched(fullData)}>
@@ -260,12 +261,16 @@ const HomeScreen = () => {
 
           <FlatList
             style={{marginTop: 8, backgroundColor: Colors.CLEAR}}
-            data={state.news?.data?.articles
-              ?.slice(0, 15)
-              ?.map((item, index) => ({
-                key: keyExtractor(item, index),
-                ...item,
-              }))}
+            data={
+              state.news.isLoading === true
+                ? Helpers.DUMMY_LOAD_DATA
+                : state.news?.data?.articles
+                    ?.slice(0, 15)
+                    ?.map((item, index) => ({
+                      key: keyExtractor(item, index),
+                      ...item,
+                    }))
+            }
             renderItem={renderHeadlines}
             keyExtractor={keyExtractor}
           />

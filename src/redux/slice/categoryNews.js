@@ -1,16 +1,23 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {APIs} from '../../constants';
+import Globals from '../../helpers/Globals';
 
 export const fetchCategoryNews = createAsyncThunk(
   'fetchCategoryNews',
-  async (params) => {
+  async params => {
     const {category} = params;
     console.log(`createAsyncThunk: category: ${category}`);
-    const categoryParam = (category != undefined && category != '' && category != null) ? `&category=${category}` : ''
+    const categoryParam =
+      category != undefined && category != '' && category != null
+        ? `&category=${category}`
+        : '';
     const response = await fetch(
-        APIs.BASE_URL +
-        'top-headlines?country=us&apiKey=' +
-        APIs.API_KEY + categoryParam
+      APIs.BASE_URL +
+        'top-headlines?country=' +
+        Globals.NEWS_SOURCE_COUNTRY.code +
+        '&apiKey=' +
+        APIs.API_KEY +
+        categoryParam,
     );
     console.log('fetchCategoryNews Request: ', response.url.toString());
     return response.json();
@@ -18,7 +25,7 @@ export const fetchCategoryNews = createAsyncThunk(
 );
 
 const newsSlice = createSlice({
-  name: 'news',
+  name: 'CategoryNews',
   initialState: {
     isLoading: false,
     data: null,

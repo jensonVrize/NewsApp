@@ -1,25 +1,33 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {APIs} from '../../constants';
+import Globals from '../../helpers/Globals';
 
-export const fetchNews = createAsyncThunk(
-  'fetchNews',
-  async (params) => {
-    const {category, isSearch, searchQuery} = params;
-    console.log(`createAsyncThunk: category: ${category} isSearch: ${isSearch} searchQuery: ${searchQuery}`);
-    const categoryParam = (category != undefined && category != '' && category != null) ? `&category=${category}` : ''
-    const response = await fetch(
-      isSearch == true
-        ? APIs.BASE_URL +
-            'everything?apiKey=' +
-            APIs.API_KEY + '&q=' + searchQuery
-        : APIs.BASE_URL +
-            'top-headlines?country=us&apiKey=' +
-            APIs.API_KEY + categoryParam
-    );
-    console.log('Request: ', response.url.toString());
-    return response.json();
-  },
-);
+export const fetchNews = createAsyncThunk('fetchNews', async params => {
+  const {category, isSearch, searchQuery} = params;
+  console.log(
+    `createAsyncThunk: category: ${category} isSearch: ${isSearch} searchQuery: ${searchQuery}`,
+  );
+  const categoryParam =
+    category != undefined && category != '' && category != null
+      ? `&category=${category}`
+      : '';
+  const response = await fetch(
+    isSearch == true
+      ? APIs.BASE_URL +
+          'everything?apiKey=' +
+          APIs.API_KEY +
+          '&q=' +
+          searchQuery
+      : APIs.BASE_URL +
+          'top-headlines?country=' +
+          Globals.NEWS_SOURCE_COUNTRY.code +
+          '&apiKey=' +
+          APIs.API_KEY +
+          categoryParam,
+  );
+  console.log('Request: ', response.url.toString());
+  return response.json();
+});
 
 const newsSlice = createSlice({
   name: 'news',

@@ -1,10 +1,14 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback, useMemo, useRef} from 'react';
 import 'react-native-gesture-handler';
 import {useNavigation, useRoute} from '@react-navigation/native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {APIs, Colors, Fonts, Images} from '../../constants';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import FastImage from 'react-native-fast-image';
+import {
+  BottomSheetModal,
+  BottomSheetModalProvider,
+  BottomSheetBackdrop,
+} from '@gorhom/bottom-sheet';
 import {
   View,
   SafeAreaView,
@@ -14,16 +18,70 @@ import {
   TouchableOpacity,
   ScrollView,
 } from 'react-native';
-
-import moment from 'moment';
+import NewsSourcePopup from './NewsSourcePopup';
+import Globals from '../../helpers/Globals';
+import AsyncStore, {AsyncStoreKeyMap} from '../../utils/AsyncStore';
+import {useDispatch} from 'react-redux';
+import {fetchNews} from '../../redux/slice/news';
 
 const SettingsScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const insets = useSafeAreaInsets();
+  const dispatch = useDispatch();
+  const [selectedCountry, setSelectedCountry] = useState(Globals.NEWS_SOURCE_COUNTRY);
 
   const backButtonAction = () => {
     navigation.goBack();
+  };
+
+  const userIconTouched = () => {
+    if (Globals.IS_AUTH == true) {
+      navigation.navigate('ProfileScreen');
+    } else {
+      navigation.navigate('LoginScreen');
+    }
+  };
+
+  // ref
+  const bottomSheetModalRef = useRef(null);
+
+  // variables
+  const snapPoints = useMemo(() => ['40%', '80%'], []);
+
+  // callbacks
+  const handlePresentModalPress = useCallback(() => {
+    bottomSheetModalRef.current?.present();
+  }, []);
+  const handleSheetChanges = useCallback((index: number) => {
+    console.log('handleSheetChanges', index);
+  }, []);
+  const handleSelectCountry = useCallback((countryInfo) => {
+    console.log('onSelectCountry countryInfo:', countryInfo);
+    setSelectedCountry(countryInfo);
+    Globals.NEWS_SOURCE_COUNTRY = countryInfo;
+    dispatch(fetchNews({category: '', isSearch: false, searchQuery: ''}));
+    AsyncStore.storeData(AsyncStoreKeyMap.newsSourceCountryInfo, countryInfo);
+    bottomSheetModalRef.current?.dismiss();
+  }, []);
+
+  const NewsSourceBottomSheet = () => {
+    return (
+      <BottomSheetModal
+        ref={bottomSheetModalRef}
+        index={1}
+        snapPoints={snapPoints}
+        onChange={handleSheetChanges}
+        backdropComponent={props => (
+          <BottomSheetBackdrop
+            {...props}
+            appearsOnIndex={0}
+            disappearsOnIndex={-1}
+          />
+        )}>
+        <NewsSourcePopup selectedCountryInfo={Globals.NEWS_SOURCE_COUNTRY} onSelectCountry={handleSelectCountry}/>
+      </BottomSheetModal>
+    );
   };
 
   return (
@@ -71,6 +129,8 @@ const SettingsScreen = () => {
 
             <View />
           </View>
+
+          <NewsSourceBottomSheet />
 
           {/* BODY */}
           <ScrollView>
@@ -127,7 +187,7 @@ const SettingsScreen = () => {
                   News Source Country:
                 </Text>
 
-                <TouchableOpacity>
+                <TouchableOpacity onPress={handlePresentModalPress}>
                   <View
                     style={{
                       marginTop: 16,
@@ -142,7 +202,7 @@ const SettingsScreen = () => {
                         fontWeight: 'bold',
                         color: Colors.APP_PRIMARY_COLOR,
                       }}>
-                      🇮🇳 India
+                     {selectedCountry.emoji} {selectedCountry.name}
                     </Text>
                     <Ionicons
                       style={{marginRight: 16}}
@@ -335,7 +395,7 @@ const SettingsScreen = () => {
                     fontWeight: 'bold',
                     color: Colors.LIGHT_GREY,
                   }}>
-                 Help
+                  Help
                 </Text>
 
                 <TouchableOpacity>
@@ -346,7 +406,6 @@ const SettingsScreen = () => {
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
-                   
                     <Ionicons
                       style={{marginRight: 16}}
                       name="play"
@@ -371,7 +430,7 @@ const SettingsScreen = () => {
                     fontWeight: 'bold',
                     color: Colors.LIGHT_GREY,
                   }}>
-                 Contact us
+                  Contact us
                 </Text>
 
                 <TouchableOpacity>
@@ -382,7 +441,6 @@ const SettingsScreen = () => {
                       justifyContent: 'center',
                       alignItems: 'center',
                     }}>
-                   
                     <Ionicons
                       style={{marginRight: 16}}
                       name="play"
@@ -391,9 +449,6 @@ const SettingsScreen = () => {
                   </View>
                 </TouchableOpacity>
               </View>
-
-
-
             </View>
           </ScrollView>
         </View>

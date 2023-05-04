@@ -171,6 +171,7 @@ const clearStore = async () => {
 export const AsyncStoreKeyMap = {
   isAuthorizerd: 'isAuthorized',
   userInfo: 'userInfo',
+  newsSourceCountryInfo: 'newsSourceCountryInfo',
 };
 
 const AsyncStore = {

@@ -31,7 +31,7 @@ const HomeScreen = () => {
   const state = useSelector(state => state);
 
   useEffect(() => {
-    dispatch(fetchNews({category: '', isSearch: false, searchQuery: 'asd'}));
+    dispatch(fetchNews({category: '', isSearch: false, searchQuery: ''}));
   }, []);
 
   const renderCategories = ({item}) => <CategoryItem fullData={item} />;

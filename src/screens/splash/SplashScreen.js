@@ -13,22 +13,34 @@ import {
 import {Platform} from 'react-native';
 import KeyboardManager from 'react-native-keyboard-manager';
 import Globals from '../../helpers/Globals';
-import AsyncStore, { AsyncStoreKeyMap } from '../../utils/AsyncStore';
+import AsyncStore, {AsyncStoreKeyMap} from '../../utils/AsyncStore';
 
 const SplashScreen = () => {
   const navigation = useNavigation();
   if (Platform.OS === 'ios') {
     KeyboardManager.setToolbarPreviousNextButtonEnable(true);
-    KeyboardManager.setToolbarTintColor(Colors.APP_PRIMARY_COLOR); 
+    KeyboardManager.setToolbarTintColor(Colors.APP_PRIMARY_COLOR);
   }
   useEffect(() => {
+    //Load news source
+    AsyncStore.getObjectValue(AsyncStoreKeyMap.newsSourceCountryInfo).then(
+      newsSourceCountryInfo => {
+        console.log('Splash newsSourceCountryInfo: ', newsSourceCountryInfo);
+        if (
+          newsSourceCountryInfo !== null ||
+          newsSourceCountryInfo !== undefined
+        ) {
+          Globals.NEWS_SOURCE_COUNTRY = newsSourceCountryInfo;
+        }
+      },
+    );
 
     //Load auth, userInfo from local DB to Globals
     AsyncStore.getObjectValue(AsyncStoreKeyMap.isAuthorizerd).then(
       isAuthorized => {
         console.log('Splash isAuthorized: ', isAuthorized);
         if (isAuthorized == true) {
-          Globals.IS_AUTH = true
+          Globals.IS_AUTH = true;
           //Reading userInfo
           AsyncStore.getObjectValue(AsyncStoreKeyMap.userInfo).then(
             userInfo => {
@@ -37,7 +49,7 @@ const SplashScreen = () => {
             },
           );
         } else {
-          Globals.IS_AUTH = false
+          Globals.IS_AUTH = false;
         }
       },
     );
